@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 #
-# DeerFlow gateway dev entrypoint â€” runs inside the docker-compose-dev gateway
+# DeerFlow gateway dev entrypoint â€?runs inside the docker-compose-dev gateway
 # container. Extracted from docker/docker-compose-dev.yaml's inline `command:`
 # (PR #2767, addressing review on Issue #2754).
 #
@@ -10,7 +10,7 @@
 #   2. Validate each extra against [A-Za-z][A-Za-z0-9_-]* so a stray shell
 #      metacharacter in `.env` cannot reach `uv sync`.
 #   3. `uv sync --all-packages` so workspace member extras (deerflow-harness's
-#      postgres extra in particular) are installed â€” see PR #2584.
+#      postgres extra in particular) are installed â€?see PR #2584.
 #   4. Self-heal: if the first sync fails, recreate .venv and retry once.
 #   5. Hand off to uvicorn with reload, replacing this shell so uvicorn becomes
 #      PID 1 inside the container.
@@ -29,7 +29,7 @@ if [ "${1:-}" = "--print-extras" ]; then
 fi
 
 # Mirror the legacy command's behavior: redirect both stdout and stderr to the
-# host-mounted log file (../logs/gateway.log â†’ /app/logs/gateway.log). Skip
+# host-mounted log file (../logs/gateway.log â†?/app/logs/gateway.log). Skip
 # the redirect under --print-extras so the test runner can capture stdout.
 if [ "$PRINT_EXTRAS_ONLY" = "0" ]; then
     exec >/app/logs/gateway.log 2>&1
@@ -39,14 +39,14 @@ fi
 
 EXTRAS_FLAGS=""
 if [ -n "${UV_EXTRAS:-}" ]; then
-    # Normalize comma â†’ space, then split on whitespace via the unquoted `for`.
+    # Normalize comma â†?space, then split on whitespace via the unquoted `for`.
     for raw in $(printf '%s' "$UV_EXTRAS" | tr ',' ' '); do
         [ -z "$raw" ] && continue
         # Reject anything that does not look like an identifier.
         # Two patterns: leading non-letter, or any non-[A-Za-z0-9_-] character.
         case "$raw" in
             [!A-Za-z]* | *[!A-Za-z0-9_-]*)
-                echo "[startup] UV_EXTRAS entry '$raw' is invalid (must match [A-Za-z][A-Za-z0-9_-]*) â€” aborting" >&2
+                echo "[startup] UV_EXTRAS entry '$raw' is invalid (must match [A-Za-z][A-Za-z0-9_-]*) â€?aborting" >&2
                 exit 1
                 ;;
         esac
@@ -82,4 +82,6 @@ fi
 
 PYTHONPATH=. exec uv run uvicorn app.gateway.app:app \
     --host 0.0.0.0 --port 8001 \
-    --reload --reload-include='*.yaml .env'
+    --workers 2 --workers 2 --reload --reload-include='*.yaml .env'
+
+
