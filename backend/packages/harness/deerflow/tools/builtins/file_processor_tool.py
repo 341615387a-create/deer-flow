@@ -1,3 +1,11 @@
+import os
+os.environ['FLAGS_use_onednn'] = '0'
+os.environ['FLAGS_enable_pir'] = '0'
+os.environ['FLAGS_new_executor'] = '0'
+os.environ['FLAGS_use_mkldnn'] = '0'
+os.environ['PADDLE_ONEDNN_ENABLE'] = '0'
+os.environ['PADDLE_PIR_ENABLE'] = '0'
+
 from pathlib import Path
 from typing import Annotated
 
@@ -21,6 +29,20 @@ _ALLOWED_EXTENSIONS = {
     'document': {'.docx'},
 }
 
+_paddle_ocr_instance = None
+
+
+def _get_paddle_ocr():
+    """获取 PaddleOCR 实例（单例模式）"""
+    global _paddle_ocr_instance
+    if _paddle_ocr_instance is None:
+        try:
+            # DISABLED: from paddleocr import PaddleOCR
+            _paddle_ocr_instance = PaddleOCR(lang='ch')
+        except Exception as e:
+            raise RuntimeError(f"Failed to initialize PaddleOCR: {str(e)}")
+    return _paddle_ocr_instance
+
 
 def _sanitize_error(error: Exception, thread_data: ThreadDataState | None) -> str:
     from deerflow.sandbox.tools import mask_local_paths_in_output
@@ -38,10 +60,10 @@ def _extract_text_with_paddleocr(image_path: str) -> str:
         提取的文字内容
     """
     try:
-        from paddleocr import PaddleOCR
+        # DISABLED: from paddleocr import PaddleOCR
         
-        ocr = PaddleOCR(use_textline_orientation=True, lang='ch')
-        result = ocr.ocr(image_path, cls=True)
+        # DISABLED: ocr = PaddleOCR(lang='ch', use_angle_cls=False)
+        result = ocr.ocr(image_path)
         
         if not result or not result[0]:
             return "未识别到文字内容"
@@ -72,6 +94,8 @@ def _extract_text_with_tesseract(image_path: str) -> str:
         import pytesseract
         from PIL import Image
         
+        pytesseract.pytesseract.tesseract_cmd = '/usr/bin/tesseract'
+        
         img = Image.open(image_path)
         text = pytesseract.image_to_string(img, lang='chi_sim+eng')
         
@@ -79,8 +103,8 @@ def _extract_text_with_tesseract(image_path: str) -> str:
             return "未识别到文字内容"
         
         return text
-    except ImportError:
-        return "错误: Tesseract 未安装"
+    except ImportError as e:
+        return f"错误: pytesseract 未安装: {str(e)}"
     except Exception as e:
         return f"OCR识别失败: {str(e)}"
 
@@ -140,10 +164,10 @@ def extract_text_from_image_tool(
         )
 
     try:
-        text = _extract_text_with_paddleocr(actual_path)
+        text = _extract_text_with_tesseract(actual_path)
         
         if text.startswith("错误:"):
-            text = _extract_text_with_tesseract(actual_path)
+            text = _extract_text_with_paddleocr(actual_path)
         
         return Command(
             update={"messages": [ToolMessage(text, tool_call_id=tool_call_id)]},

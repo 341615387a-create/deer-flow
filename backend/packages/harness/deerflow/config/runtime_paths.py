@@ -32,7 +32,12 @@ def resolve_path(value: str | os.PathLike[str], *, base: Path | None = None) -> 
 
 
 def existing_project_file(names: tuple[str, ...]) -> Path | None:
-    """Return the first existing named file under the project root."""
+    """Return the first existing named file. Checks CWD first for dev mode."""
+    cwd = Path.cwd().resolve()
+    for name in names:
+        candidate = cwd / name
+        if candidate.is_file():
+            return candidate
     root = project_root()
     for name in names:
         candidate = root / name
