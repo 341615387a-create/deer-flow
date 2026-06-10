@@ -165,6 +165,7 @@ services:
     environment:
       - CI=true
       - DEER_FLOW_PROJECT_ROOT=/app
+      - ENABLE_CUSTOM_AGENT_MANAGEMENT=true
       - DEER_FLOW_HOME=/app/backend/.deer-flow
       - DEER_FLOW_CHANNELS_LANGGRAPH_URL=${DEER_FLOW_CHANNELS_LANGGRAPH_URL:-http://gateway:8001/api}
       - DEER_FLOW_CHANNELS_GATEWAY_URL=${DEER_FLOW_CHANNELS_GATEWAY_URL:-http://gateway:8001}
