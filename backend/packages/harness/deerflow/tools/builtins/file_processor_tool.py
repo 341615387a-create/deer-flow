@@ -99,7 +99,6 @@ def extract_text_from_image_tool(
         image_path: Absolute /mnt/user-data virtual path to the image file. Supported formats: jpg, jpeg, png, webp, bmp, tiff.
     """
     thread_data = get_thread_data(runtime)
-    requested_path = image_path
 
     if not image_path.startswith(VIRTUAL_PATH_PREFIX):
         return Command(
@@ -166,7 +165,6 @@ def read_docx_tool(
         file_path: Absolute /mnt/user-data virtual path to the DOCX file.
     """
     thread_data = get_thread_data(runtime)
-    requested_path = file_path
 
     if not file_path.startswith(VIRTUAL_PATH_PREFIX):
         return Command(
