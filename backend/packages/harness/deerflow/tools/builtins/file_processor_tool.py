@@ -15,7 +15,6 @@ from deerflow.sandbox.tools import (
 )
 from deerflow.tools.types import Runtime
 
-
 _ALLOWED_EXTENSIONS = {
     'image': {'.jpg', '.jpeg', '.png', '.webp', '.bmp', '.tiff'},
     'document': {'.docx'},
