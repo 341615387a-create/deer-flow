@@ -1,4 +1,4 @@
-import asyncio
+﻿import asyncio
 import subprocess
 from langchain.tools import tool
 
@@ -23,7 +23,7 @@ async def web_fetch_tool(url: str) -> str:
             err = stderr.decode().strip()
             return f'Error: No content extracted. {err}' if err else 'Error: Empty response'
         return output[:8192]
-    except asyncio.TimeoutError:
+    except TimeoutError:
         return 'Error: Browser fetch timed out'
     except Exception as e:
         return f'Error: {str(e)}'
